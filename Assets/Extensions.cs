@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 
 public static class Extensions
 {
@@ -45,6 +46,12 @@ public static class Extensions
         Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y);
     public static bool ApproximatelyEqual(this Vector3 a, Vector3 b) =>
         Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y) && Mathf.Approximately(a.z, b.z);
+    public static Vector2 SmoothDamp(this Vector2 value, Vector2 target, ref Vector2 currentVelocity, float smoothTime) =>
+        Vector2.SmoothDamp(value, target, ref currentVelocity, smoothTime);
+    public static Vector3 SmoothDamp(this Vector3 value, Vector3 target, ref Vector3 currentVelocity, float smoothTime) =>
+        Vector3.SmoothDamp(value, target, ref currentVelocity, smoothTime);
+    public static Vector3 To3(this Vector2 v) => v;
+    public static Vector2 To2(this Vector3 v) => v;
     
     
     //floats
@@ -52,6 +59,9 @@ public static class Extensions
     public static float Lerp(this float t, float value1, float value2) => Mathf.Lerp(value1, value2, t);
     public static float LowerBound(this float value, float bound) => Mathf.Max(value, bound);
     public static float UppedBound(this float value, float bound) => Mathf.Min(value, bound);
-    public static void MoveRefTo(this ref float value, float target, float maxDelta) => value = Mathf.MoveTowards(value, target, maxDelta);
+    public static void MoveToRef(this ref float value, float target, float maxDelta) => value = Mathf.MoveTowards(value, target, maxDelta);
     public static float MoveTo(this float value, float target, float maxDelta) => Mathf.MoveTowards(value, target, maxDelta);
+    public static float SmoothDamp(this float value, float target, ref float currentVelocity, float smoothTime) =>
+        Mathf.SmoothDamp(value, target, ref currentVelocity, smoothTime);
+
 }
