@@ -1,12 +1,13 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 public class OrderPanel : MonoBehaviour
 {
-    [SerializeField] private Texture2D tex; // Texture for the order image
-    [SerializeField] private Sprite[] frameSprites; // Array of sprites for the frame animation
-    [SerializeField] private float frameRate = 6f; // Frame rate for the frame animation
+    //fields////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    [SerializeField] private Sprite[] frameSprites;
+    [SerializeField] private float frameRate = 6f;
 
     private VisualElement _popupRoot;
     private VisualElement _popupPanel;
@@ -16,13 +17,13 @@ public class OrderPanel : MonoBehaviour
     private Image _orderImage;
 
     private int _currentFrameIndex;
-    private float _frameDuration; // Duration of each frame (1 / frameRate)
+    private float _frameDuration;
     private Coroutine _animationCoroutine;
 
+    //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Awake()
     {
-        Debug.Assert(tex != null, "Order image texture must be assigned");
-        Debug.Assert(frameSprites.Length > 0, "Frame sprites array must be assigned and contain at least one sprite");
+        Assert.IsTrue(frameSprites.Length > 0);
     }
 
     private void OnEnable()
@@ -32,26 +33,28 @@ public class OrderPanel : MonoBehaviour
 
         CreatePopupPanel();
 
-        ShowPopup(tex, "A leaf", "This is a leaf.");
+        Hide();
     }
 
-    public void ShowPopup(Texture2D image, string title, string description)
+    //public interface//////////////////////////////////////////////////////////////////////////////////////////////////
+    public void ShowFor(ItemData itemData)
     {
-        _orderImage.image = image; // Assign the texture to the image
-        _titleLabel.text = title;
-        _descriptionLabel.text = description;
+        _orderImage.image = itemData.icon.texture;
+        _titleLabel.text = itemData.title;
+        _descriptionLabel.text = itemData.description;
         _popupPanel.style.display = DisplayStyle.Flex;
 
-        StartFrameAnimation(); // Start animating the frame
+        StartFrameAnimation();
     }
-
-    public void HidePopup()
+    
+    public void Hide()
     {
         _popupPanel.style.display = DisplayStyle.None;
 
         StopFrameAnimation(); // Stop animating the frame
     }
 
+    //private logic/////////////////////////////////////////////////////////////////////////////////////////////////////
     private void CreatePopupPanel()
     {
         // Main panel container
@@ -141,7 +144,7 @@ public class OrderPanel : MonoBehaviour
 
         _popupRoot.Add(_popupPanel);
 
-        HidePopup();
+        Hide();
     }
 
     private void StartFrameAnimation()

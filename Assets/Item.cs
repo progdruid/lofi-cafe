@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
+[Serializable]
+[CreateAssetMenu(fileName = "Item", menuName = "Cafe/Item")]
+public class ItemData : ScriptableObject
+{
+    public string title;
+    public string description;
+    public Sprite icon;
+}
+
 public class Item : MonoBehaviour
 {
     //static part///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,13 +20,16 @@ public class Item : MonoBehaviour
     
     
     //fields////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    [Header("Settings")]
+    [Header("Movement")]
     [SerializeField] private float gravityScale = 1f;
     [SerializeField] private float drag = 0.5f;
     [SerializeField] private float smoothTime = 0.1f;
+    [Header("Item")]
+    [SerializeField] private ItemData itemData;
     [Header("Dependencies")]
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private CircleCollider2D circleCollider;
+    [SerializeField] private SpriteRenderer spriteRenderer;
     
     private Vector2 _smoothingVelocity = Vector2.zero;
     
@@ -25,8 +37,12 @@ public class Item : MonoBehaviour
     //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Awake()
     {
+        Assert.IsNotNull(itemData);
         Assert.IsNotNull(rb);
         Assert.IsNotNull(circleCollider);
+        Assert.IsNotNull(spriteRenderer);
+        
+        spriteRenderer.sprite = itemData.icon;
         
         EndDrag();
         
@@ -40,6 +56,8 @@ public class Item : MonoBehaviour
 
     
     //public interface//////////////////////////////////////////////////////////////////////////////////////////////////
+    public ItemData ItemData => itemData;
+    
     public bool IsPointOver(Vector2 point) => circleCollider.OverlapPoint(point);
 
     public void BeginDrag()
@@ -79,5 +97,13 @@ public class Item : MonoBehaviour
         rb.simulated = true;
         
         Items.Add(this);
+    }
+
+    public void Delete()
+    {
+        Items.Remove(this);
+        Destroy(rb.gameObject);
+        if (this)
+            Destroy(this);
     }
 }

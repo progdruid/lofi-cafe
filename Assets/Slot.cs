@@ -12,9 +12,9 @@ public class Slot : MonoBehaviour
     [SerializeField] private float halfBoxSize = 1f;
 
     [Header("Animation")] 
-    [SerializeField] private Sprite[] sprites; // Array of sprites for animation
-    [SerializeField] private float fps = 10f; // FPS for animation speed
-    [SerializeField] private SpriteRenderer spriteRenderer; // Exposed to the inspector for assigning the SpriteRenderer
+    [SerializeField] private Sprite[] sprites;
+    [SerializeField] private float fps = 10f;
+    [SerializeField] private SpriteRenderer spriteRenderer; 
 
     private Item _item;
     private float _frameTimer = 0f;

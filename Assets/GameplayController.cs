@@ -4,17 +4,36 @@ using UnityEngine.Assertions;
 
 public class GameplayController : MonoBehaviour
 {
+    //fields////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    [Header("Settings")] 
+    [SerializeField] private ItemData placedItem;
+    [SerializeField] private GameObject itemPrefab;
+    [Header("Dependencies")]
     [SerializeField] private Camera targetCamera;
-
+    [SerializeField] private Slot orderDepositSlot;
+    [SerializeField] private OrderPanel orderPanel;
+    
     private Item _draggedItem = null;
     private Vector2 _smoothingVelocity;
     private Vector2 _mousePosition;
+
+    private ItemData _currentOrder;
     
+    //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Awake()
     {
+        Assert.IsNotNull(placedItem);
+        Assert.IsNotNull(itemPrefab);
         Assert.IsNotNull(targetCamera);
+        Assert.IsNotNull(orderDepositSlot);
+        Assert.IsNotNull(orderPanel);
+
+        _currentOrder = placedItem;
+        
+        orderDepositSlot.ItemChangeEvent += HandleSlotItemChange;
     }
 
+    //game events///////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -67,4 +86,22 @@ public class GameplayController : MonoBehaviour
     {
         _draggedItem?.DragTo(_mousePosition);
     }
+    
+    //private logic/////////////////////////////////////////////////////////////////////////////////////////////////////
+    private void HandleSlotItemChange(Item previous, Item current)
+    {
+        if (_currentOrder != current.ItemData)
+            return;
+        
+        orderDepositSlot.ItemChangeEvent -= HandleSlotItemChange;
+        var item = orderDepositSlot.Pop();
+        item.Delete();
+        orderDepositSlot.ItemChangeEvent += HandleSlotItemChange;
+        
+        orderPanel.Hide();
+        orderPanel.ShowFor(current.ItemData);
+        
+        Instantiate(itemPrefab, new Vector3(10, 10, 0), Quaternion.identity);
+    }
+    
 }
