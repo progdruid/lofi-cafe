@@ -60,7 +60,6 @@ public class GameplayController : MonoBehaviour
             }
 
             if (!_draggedItem)
-            {
                 foreach (var slot in Slot.All)
                 {
                     if (!slot.IsPointOver(_mousePosition)) continue;
@@ -70,7 +69,13 @@ public class GameplayController : MonoBehaviour
                     _draggedItem.BeginDrag();
                     break;
                 }
-            }
+
+            if (!_draggedItem)
+                foreach (var deposit in IngredientDeposit.All)
+                {
+                    if (!deposit.IsPointOver(_mousePosition)) continue;
+                    deposit.DropItem();
+                }
         }
         else if (Input.GetMouseButtonUp(0) && _draggedItem)
         {

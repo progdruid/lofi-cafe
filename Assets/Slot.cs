@@ -49,6 +49,8 @@ public class Slot : MonoBehaviour
         ItemChangeEvent?.Invoke(previous, _item);
     }
 
+    public Item Get() => _item;
+    
     public Item Pop()
     {
         if (!_item) return null;

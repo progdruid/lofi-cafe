@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
-
-[Serializable]
-[CreateAssetMenu(fileName = "Item", menuName = "Cafe/Item")]
-public class ItemData : ScriptableObject
-{
-    public string title;
-    public string description;
-    public Sprite icon;
-}
 
 public class Item : MonoBehaviour
 {
