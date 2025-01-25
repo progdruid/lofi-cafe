@@ -1,9 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Serialization;
 
 public class Item : MonoBehaviour
 {
+    //static part///////////////////////////////////////////////////////////////////////////////////////////////////////
+    private static readonly HashSet<Item> Items = new();
+    public static IReadOnlyCollection<Item> All => Items;
+    
+    
+    //fields////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [Header("Settings")]
     [SerializeField] private float gravityScale = 1f;
     [SerializeField] private float drag = 0.5f;
@@ -12,50 +19,65 @@ public class Item : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private CircleCollider2D circleCollider;
     
-    private Camera _mainCamera;
-    private bool _isDragging = false;
-    private Vector2 _offset;
     private Vector2 _smoothingVelocity = Vector2.zero;
-
+    
+    
+    //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Awake()
     {
         Assert.IsNotNull(rb);
         Assert.IsNotNull(circleCollider);
         
+        EndDrag();
+        
+        Items.Add(this);
+    }
+
+    private void OnDestroy()
+    {
+        Items.Remove(this);
+    }
+
+    
+    //public interface//////////////////////////////////////////////////////////////////////////////////////////////////
+    public bool IsPointOver(Vector2 point) => circleCollider.OverlapPoint(point);
+
+    public void BeginDrag()
+    {
+        rb.gravityScale = 0;
+        rb.linearVelocity = Vector2.zero;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        _smoothingVelocity = Vector2.zero;
+    }
+
+    public void EndDrag()
+    {
         rb.gravityScale = gravityScale;
         rb.linearDamping = drag;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Discrete;
-
-        _mainCamera = Camera.main;
+        //rb.linearVelocity = _smoothingVelocity;
     }
 
-    private void Update()
+    public void DragTo(Vector2 point)
     {
-        var mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition).To2();
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (circleCollider.OverlapPoint(mousePosition))
-            {
-                _isDragging = true;
-                _offset = (Vector2)transform.position - mousePosition;
-                rb.gravityScale = 0;
-                rb.linearVelocity = Vector2.zero;
-                rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-            }
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            _isDragging = false;
-            rb.gravityScale = gravityScale;
-            rb.collisionDetectionMode = CollisionDetectionMode2D.Discrete;
-            rb.linearVelocity = _smoothingVelocity;
-        }
-
-        if (!_isDragging)
-            return;
-        
-        var targetPosition = mousePosition + _offset;
-        var smoothedPosition = rb.position.SmoothDamp(targetPosition, ref _smoothingVelocity, smoothTime);
+        var smoothedPosition = rb.position.SmoothDamp(point, ref _smoothingVelocity, smoothTime);
         rb.MovePosition(smoothedPosition);
+    }
+
+    public void Lock(Vector2 anchor)
+    {
+        Items.Remove(this);
+
+        transform.SetWorldXY(anchor);
+        rb.simulated = false;
+        circleCollider.enabled = false;
+    }
+
+    public void Unlock()
+    {
+        circleCollider.enabled = true;
+        rb.simulated = true;
+        
+        Items.Add(this);
     }
 }

@@ -63,5 +63,6 @@ public static class Extensions
     public static float MoveTo(this float value, float target, float maxDelta) => Mathf.MoveTowards(value, target, maxDelta);
     public static float SmoothDamp(this float value, float target, ref float currentVelocity, float smoothTime) =>
         Mathf.SmoothDamp(value, target, ref currentVelocity, smoothTime);
-
+    
+    public static bool Between (this float value, float from, float to) => value > from && value < to;
 }
