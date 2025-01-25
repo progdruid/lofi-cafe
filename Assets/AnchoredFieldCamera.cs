@@ -34,10 +34,10 @@ public class AnchoredFieldCamera : MonoBehaviour
             targetCamera.orthographicSize = targetCamera.orthographicSize.SmoothDamp(minZoom, ref _zoomVelocity, zoomTime);
         else if (distanceInField > zoomOutThreshold)
             targetCamera.orthographicSize = targetCamera.orthographicSize.SmoothDamp(maxZoom, ref _zoomVelocity, zoomTime);
-        
-        var middle = targetCamera.ViewportToWorldPoint((viewportPoint + viewportAnchor) * 0.5f).To2();
+
+        var middle = targetCamera.ViewportToWorldPoint((viewportAnchor + viewportPoint) * 0.5f).To2();
         var targetPos = targetCamera.transform.position.To2().SmoothDamp(middle, ref _motionVelocity, motionTime);
-        targetPos.y = (targetPos.y - targetCamera.orthographicSize).LowerBound(groundY) + targetCamera.orthographicSize;
+        targetPos.y = (targetPos.y - targetCamera.orthographicSize).ClampBottom(groundY) + targetCamera.orthographicSize;
         targetCamera.transform.SetWorldXY(targetPos);
     }
 }

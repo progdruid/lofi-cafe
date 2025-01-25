@@ -57,8 +57,8 @@ public static class Extensions
     //floats
     public static float Abs(this float value) => Mathf.Abs(value);
     public static float Lerp(this float t, float value1, float value2) => Mathf.Lerp(value1, value2, t);
-    public static float LowerBound(this float value, float bound) => Mathf.Max(value, bound);
-    public static float UppedBound(this float value, float bound) => Mathf.Min(value, bound);
+    public static float ClampBottom(this float value, float bound) => Mathf.Max(value, bound);
+    public static float ClampTop(this float value, float bound) => Mathf.Min(value, bound);
     public static void MoveToRef(this ref float value, float target, float maxDelta) => value = Mathf.MoveTowards(value, target, maxDelta);
     public static float MoveTo(this float value, float target, float maxDelta) => Mathf.MoveTowards(value, target, maxDelta);
     public static float SmoothDamp(this float value, float target, ref float currentVelocity, float smoothTime) =>
