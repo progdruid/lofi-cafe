@@ -31,6 +31,9 @@ public class GameplayController : MonoBehaviour
         _currentOrder = placedItem;
         
         orderDepositSlot.ItemChangeEvent += HandleSlotItemChange;
+        
+        var newItem = Instantiate(itemPrefab, new Vector3(10, 10, 0), Quaternion.identity).GetComponent<Item>();
+        newItem.ItemData = placedItem;
     }
 
     //game events///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,8 +103,9 @@ public class GameplayController : MonoBehaviour
         
         orderPanel.Hide();
         orderPanel.ShowFor(current.ItemData);
-        
-        Instantiate(itemPrefab, new Vector3(10, 10, 0), Quaternion.identity);
+
+        var newItem = Instantiate(itemPrefab, new Vector3(10, 10, 0), Quaternion.identity).GetComponent<Item>();
+        newItem.ItemData = placedItem;
     }
     
 }

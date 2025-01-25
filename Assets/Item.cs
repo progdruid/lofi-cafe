@@ -24,8 +24,6 @@ public class Item : MonoBehaviour
     [SerializeField] private float gravityScale = 1f;
     [SerializeField] private float drag = 0.5f;
     [SerializeField] private float smoothTime = 0.1f;
-    [Header("Item")]
-    [SerializeField] private ItemData itemData;
     [Header("Dependencies")]
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private CircleCollider2D circleCollider;
@@ -33,20 +31,20 @@ public class Item : MonoBehaviour
     
     private Vector2 _smoothingVelocity = Vector2.zero;
     
+    private ItemData _itemData;
     
     //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Awake()
     {
-        Assert.IsNotNull(itemData);
         Assert.IsNotNull(rb);
         Assert.IsNotNull(circleCollider);
         Assert.IsNotNull(spriteRenderer);
         
-        spriteRenderer.sprite = itemData.icon;
-        
         EndDrag();
         
         Items.Add(this);
+
+        gameObject.SetActive(false);
     }
 
     private void OnDestroy()
@@ -56,8 +54,26 @@ public class Item : MonoBehaviour
 
     
     //public interface//////////////////////////////////////////////////////////////////////////////////////////////////
-    public ItemData ItemData => itemData;
-    
+    public ItemData ItemData
+    {
+        get => _itemData;
+        set
+        {
+            _itemData = value;
+            if (_itemData)
+            {
+                spriteRenderer.sprite = _itemData.icon;
+                gameObject.SetActive(true);
+            }
+            else
+            {
+                
+                spriteRenderer.sprite = null;
+                gameObject.SetActive(false);
+            }
+        }
+    }
+
     public bool IsPointOver(Vector2 point) => circleCollider.OverlapPoint(point);
 
     public void BeginDrag()
