@@ -3,18 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-[CreateAssetMenu(fileName = "Recipe", menuName = "Cafe/Recipe", order = 1)]
-public class Recipe : ScriptableObject
-{
-    [SerializeField] private SerializableMap<ItemData, int> ingredients;
-    [SerializeField] private ItemData[] products;
-    [SerializeField] private int emptySlots;
-    
-    public IReadOnlyCollection<ItemData> Products => products;
-    public IReadOnlyDictionary<ItemData, int> Ingredients => ingredients;
-    public int EmptySlots => emptySlots;
-}
-
 public class Machine : MonoBehaviour
 {
     //fields////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,6 +16,7 @@ public class Machine : MonoBehaviour
     [SerializeField] private float fps = 10f;
     [SerializeField] private SpriteRenderer spriteRenderer; 
     
+    private float _oneFrameTime;
     private float _frameTimer = 0f;
     private int _currentFrame = 0;
     
@@ -35,20 +24,20 @@ public class Machine : MonoBehaviour
     //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Awake()
     {
+        Assert.IsTrue(sprites.Length > 0);
+        
         foreach (var slot in slots) 
             slot.ItemChangeEvent += HandleSlotChange;
+        
+        _oneFrameTime = 1f / fps;
     }
     
     //game events///////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Update()
     {
-        // Animation logic
-        if (sprites.Length <= 0) 
-            return;
-        
         _frameTimer += Time.deltaTime;
 
-        if (_frameTimer < 1f / fps) 
+        if (_frameTimer < _oneFrameTime) 
             return;
         
         _frameTimer = 0f;
@@ -107,6 +96,7 @@ public class Machine : MonoBehaviour
         foreach (var product in foundRecipe.Products)
         {
             var item = Instantiate(itemPrefab, dropPoint.position, Quaternion.identity).GetComponent<Item>();
+            item.transform.SetWorldZ(0);
             item.ItemData = product;
         }
     }

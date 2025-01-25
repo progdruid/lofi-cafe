@@ -40,6 +40,7 @@ public class OrderPanel : MonoBehaviour
     public void ShowFor(ItemData itemData)
     {
         _orderImage.image = itemData.icon.texture;
+        _orderImage.sourceRect = itemData.icon.rect;
         _titleLabel.text = itemData.title;
         _descriptionLabel.text = itemData.description;
         _popupPanel.style.display = DisplayStyle.Flex;

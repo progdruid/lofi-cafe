@@ -49,6 +49,7 @@ public class IngredientDeposit : MonoBehaviour
     public void DropItem()
     {
         var item = Instantiate(itemPrefab, dropPoint.position, Quaternion.identity).GetComponent<Item>();
+        item.transform.SetWorldZ(0);
         item.ItemData = itemData;
     }
 }
