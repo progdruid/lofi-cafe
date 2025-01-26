@@ -5,13 +5,13 @@ using UnityEngine.UIElements;
 
 public class OrderPanel : MonoBehaviour
 {
-    //fields////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [SerializeField] private Sprite[] frameSprites;
     [SerializeField] private float frameRate = 6f;
+    [SerializeField] private float maxDescriptionHeight = 200f;
 
     private VisualElement _popupRoot;
     private VisualElement _popupPanel;
-    private VisualElement _imageFrame; // Frame container
+    private VisualElement _imageFrame;
     private Label _titleLabel;
     private Label _descriptionLabel;
     private Image _orderImage;
@@ -20,7 +20,6 @@ public class OrderPanel : MonoBehaviour
     private float _frameDuration;
     private Coroutine _animationCoroutine;
 
-    //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Awake()
     {
         Assert.IsTrue(frameSprites.Length > 0);
@@ -36,11 +35,9 @@ public class OrderPanel : MonoBehaviour
         Hide();
     }
 
-    //public interface//////////////////////////////////////////////////////////////////////////////////////////////////
     public void ShowFor(ItemData itemData)
     {
-        _orderImage.image = itemData.icon.texture;
-        _orderImage.sourceRect = itemData.icon.rect;
+        _orderImage.sprite = itemData.icon;
         _titleLabel.text = itemData.title;
         _descriptionLabel.text = itemData.description;
         _popupPanel.style.display = DisplayStyle.Flex;
@@ -52,13 +49,11 @@ public class OrderPanel : MonoBehaviour
     {
         _popupPanel.style.display = DisplayStyle.None;
 
-        StopFrameAnimation(); // Stop animating the frame
+        StopFrameAnimation();
     }
 
-    //private logic/////////////////////////////////////////////////////////////////////////////////////////////////////
     private void CreatePopupPanel()
     {
-        // Main panel container
         _popupPanel = new VisualElement();
         _popupPanel.AddToClassList("order-popup");
 
@@ -66,23 +61,34 @@ public class OrderPanel : MonoBehaviour
         _popupPanel.style.top = 20;
         _popupPanel.style.left = 20;
         _popupPanel.style.width = 350;
-        _popupPanel.style.backgroundColor = new StyleColor(new Color(0.89f, 1.0f, 0.76f)); // E3FFC3
-        _popupPanel.style.borderTopColor = new StyleColor(new Color(0.21f, 0.49f, 0.49f)); // 357C7D
-        _popupPanel.style.borderRightColor = new StyleColor(new Color(0.21f, 0.49f, 0.49f)); // 357C7D
-        _popupPanel.style.borderBottomColor = new StyleColor(new Color(0.21f, 0.49f, 0.49f)); // 357C7D
-        _popupPanel.style.borderLeftColor = new StyleColor(new Color(0.21f, 0.49f, 0.49f)); // 357C7D
-        _popupPanel.style.borderTopWidth = 2f;
-        _popupPanel.style.borderRightWidth = 2f;
-        _popupPanel.style.borderBottomWidth = 2f;
-        _popupPanel.style.borderLeftWidth = 2f;
+        _popupPanel.style.backgroundColor = new StyleColor(new Color(0.89f, 1.0f, 0.76f));
+        _popupPanel.style.borderTopColor = new StyleColor(new Color(0.21f, 0.49f, 0.49f));
+        _popupPanel.style.borderRightColor = new StyleColor(new Color(0.21f, 0.49f, 0.49f));
+        _popupPanel.style.borderBottomColor = new StyleColor(new Color(0.21f, 0.49f, 0.49f));
+        _popupPanel.style.borderLeftColor = new StyleColor(new Color(0.21f, 0.49f, 0.49f));
+        _popupPanel.style.borderTopWidth = 8f;
+        _popupPanel.style.borderRightWidth = 8f;
+        _popupPanel.style.borderBottomWidth = 8f;
+        _popupPanel.style.borderLeftWidth = 8f;
         _popupPanel.style.borderBottomLeftRadius = 8f;
         _popupPanel.style.borderBottomRightRadius = 8f;
         _popupPanel.style.borderTopLeftRadius = 8f;
         _popupPanel.style.borderTopRightRadius = 8f;
         _popupPanel.style.paddingLeft = 15f;
-        _popupPanel.style.flexDirection = FlexDirection.Row;
+        _popupPanel.style.paddingRight = 15f;
+        _popupPanel.style.paddingBottom = 5f;
+        _popupPanel.style.paddingTop = 5f;
+        _popupPanel.style.flexDirection = FlexDirection.Column;
 
-        // Create the frame element
+        var topRow = new VisualElement
+        {
+            style =
+            {
+                flexDirection = FlexDirection.Row,
+                flexGrow = 0
+            }
+        };
+
         _imageFrame = new VisualElement
         {
             style =
@@ -97,7 +103,6 @@ public class OrderPanel : MonoBehaviour
             }
         };
 
-        // Create the image inside the frame
         _orderImage = new Image
         {
             style =
@@ -108,9 +113,8 @@ public class OrderPanel : MonoBehaviour
         };
 
         _imageFrame.Add(_orderImage);
-        _popupPanel.Add(_imageFrame); // Add the frame element
+        topRow.Add(_imageFrame);
 
-        // Create labels
         var contentContainer = new VisualElement
         {
             style =
@@ -136,12 +140,15 @@ public class OrderPanel : MonoBehaviour
             style =
             {
                 fontSize = 16,
-                color = new Color(0.4f, 0.4f, 0.4f)
+                color = new Color(0.4f, 0.4f, 0.4f),
+                flexWrap = Wrap.Wrap,
+                whiteSpace = WhiteSpace.Normal
             }
         };
         contentContainer.Add(_descriptionLabel);
 
-        _popupPanel.Add(contentContainer);
+        topRow.Add(contentContainer);
+        _popupPanel.Add(topRow);
 
         _popupRoot.Add(_popupPanel);
 
@@ -172,7 +179,6 @@ public class OrderPanel : MonoBehaviour
         {
             if (frameSprites.Length == 0) yield break;
 
-            // Update the frame's background image
             _imageFrame.style.backgroundImage = new StyleBackground(frameSprites[_currentFrameIndex]);
             _currentFrameIndex = (_currentFrameIndex + 1) % frameSprites.Length;
             yield return new WaitForSeconds(_frameDuration);
