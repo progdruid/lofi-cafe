@@ -14,6 +14,7 @@ public class OrderPanel : MonoBehaviour
     private VisualElement _popupPanel;
     private VisualElement _imageFrame;
     private Label _titleLabel;
+    private Label _orderTitleLabel;
     private Label _descriptionLabel;
     private Image _orderImage;
     private bool _shown = false;
@@ -44,6 +45,16 @@ public class OrderPanel : MonoBehaviour
         StopFrameAnimation();
     }
 
+    public void SetOrderTitleToCompleted()
+    {
+        _orderTitleLabel.text = "Order Completed";
+    }
+
+    public void ResetOrderTitle()
+    {
+        _orderTitleLabel.text = "Next Order:";
+    }
+
     public void ChangeTo(ItemData itemData)
     {
         if (_slideCoroutine != null) 
@@ -60,10 +71,11 @@ public class OrderPanel : MonoBehaviour
             StopFrameAnimation();
         }
         
+        ResetOrderTitle();
         _orderImage.sprite = itemData.icon;
         _titleLabel.text = itemData.title;
         _descriptionLabel.text = itemData.description;
-
+        
         yield return SlideAnimation(true);
         StopFrameAnimation();
         _shown = true;
@@ -82,7 +94,6 @@ public class OrderPanel : MonoBehaviour
     private IEnumerator SlideAnimation(bool show)
     {
         float elapsedTime = 0;
-        //_popupPanel.resolvedStyle.height
         float startPosition = show ? -400 : 20;
         float endPosition = show ? 20 : -400;
 
@@ -134,6 +145,18 @@ public class OrderPanel : MonoBehaviour
         _popupPanel.style.paddingBottom = 5f;
         _popupPanel.style.paddingTop = 5f;
         _popupPanel.style.flexDirection = FlexDirection.Column;
+
+        _orderTitleLabel = new Label("Next Order:")
+        {
+            style =
+            {
+                fontSize = 25,
+                marginBottom = 0f,
+                unityFontStyleAndWeight = FontStyle.Bold,
+                color = new Color(0.2f, 0.2f, 0.2f)
+            }
+        };
+        _popupPanel.Add(_orderTitleLabel);
 
         var topRow = new VisualElement
         {
