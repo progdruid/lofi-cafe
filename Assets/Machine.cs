@@ -13,14 +13,6 @@ public class Machine : MonoBehaviour
     [SerializeField] private GameObject itemPrefab;
     [SerializeField] private ItemData wasteItemData;
     
-    [Header("Animation")] 
-    [SerializeField] private Sprite[] sprites;
-    [SerializeField] private float fps = 10f;
-    [SerializeField] private SpriteRenderer spriteRenderer; 
-    
-    private float _oneFrameTime;
-    private float _frameTimer = 0f;
-    private int _currentFrame = 0;
     private int _lastDropBeat = int.MinValue;
     
     private IReadOnlyCollection<ItemData> _productsToDrop = null;
@@ -29,12 +21,8 @@ public class Machine : MonoBehaviour
     //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Awake()
     {
-        Assert.IsTrue(sprites.Length > 0);
-        
         foreach (var slot in slots) 
             slot.ItemChangeEvent += HandleSlotChange;
-        
-        _oneFrameTime = 1f / fps;
     }
 
     private void Start() => Beat.Global.BeatEvent += HandleBeat;
@@ -42,18 +30,6 @@ public class Machine : MonoBehaviour
 
     
     //game events///////////////////////////////////////////////////////////////////////////////////////////////////////
-    private void Update()
-    {
-        _frameTimer += Time.deltaTime;
-
-        if (_frameTimer < _oneFrameTime) 
-            return;
-        
-        _frameTimer = 0f;
-        _currentFrame = (_currentFrame + 1) % sprites.Length;
-        spriteRenderer.sprite = sprites[_currentFrame];
-    }
-
     private void HandleBeat(int beat)
     {
         if (beat < _lastDropBeat + workPeriodInBeats)

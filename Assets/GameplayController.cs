@@ -98,7 +98,7 @@ public class GameplayController : MonoBehaviour
     //private logic/////////////////////////////////////////////////////////////////////////////////////////////////////
     private void HandleSlotItemChange(Item previous, Item current)
     {
-        if (!current && _currentOrder != current.ItemData)
+        if (!current || _currentOrder != current.ItemData)
             return;
         
         orderDepositSlot.ItemChangeEvent -= HandleSlotItemChange;
