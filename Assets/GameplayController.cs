@@ -7,6 +7,7 @@ public class GameplayController : MonoBehaviour
 {
     //fields////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [Header("Settings")] 
+    [SerializeField] private ItemData[] tutorialItems;
     [SerializeField] private ItemData[] items;
     [Header("Dependencies")]
     [SerializeField] private Camera targetCamera;
@@ -18,6 +19,7 @@ public class GameplayController : MonoBehaviour
     private Vector2 _mousePosition;
 
     private ItemData _currentOrder;
+    private int _tutorialCounter = 0;
     
     //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Awake()
@@ -31,7 +33,7 @@ public class GameplayController : MonoBehaviour
 
     private void Start()
     {
-        PlaceRandomOrder();
+        PlaceNextOrder();
     }
 
     //game events///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,13 +107,22 @@ public class GameplayController : MonoBehaviour
         orderDepositSlot.ItemChangeEvent += HandleSlotItemChange;
 
         orderPanel.SetOrderTitleToCompleted();
-        PlaceRandomOrder();
+        PlaceNextOrder();
     }
 
-    private void PlaceRandomOrder()
+    private void PlaceNextOrder()
     {
-        var randomIndex = Random.Range(0, items.Length);
-        _currentOrder = items[randomIndex];
+
+        if (_tutorialCounter < tutorialItems.Length)
+        {
+            _currentOrder = tutorialItems[_tutorialCounter];
+            _tutorialCounter++;
+        }
+        else
+        {
+            var randomIndex = Random.Range(0, items.Length);
+            _currentOrder = items[randomIndex];
+        }
         orderPanel.ChangeTo(_currentOrder);
     }
 }
