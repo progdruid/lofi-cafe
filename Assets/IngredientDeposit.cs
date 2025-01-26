@@ -46,10 +46,11 @@ public class IngredientDeposit : MonoBehaviour
         point.x.Between(transform.position.x - _halfWidth, transform.position.x + _halfWidth) &&
         point.y.Between(transform.position.y - _halfHeight, transform.position.y + _halfHeight);
 
-    public void DropItem()
+    public Item DropItem()
     {
         var item = Instantiate(itemPrefab, dropPoint.position, Quaternion.identity).GetComponent<Item>();
         item.transform.SetWorldZ(0);
         item.ItemData = itemData;
+        return item;
     }
 }

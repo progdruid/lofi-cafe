@@ -74,7 +74,11 @@ public class GameplayController : MonoBehaviour
                 foreach (var deposit in IngredientDeposit.All)
                 {
                     if (!deposit.IsPointOver(_mousePosition)) continue;
-                    deposit.DropItem();
+                    var item = deposit.DropItem();
+                    if (!item) continue;
+                    _draggedItem = item;
+                    _draggedItem.BeginDrag();
+                    break;
                 }
         }
         else if (Input.GetMouseButtonUp(0) && _draggedItem)
