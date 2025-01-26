@@ -6,10 +6,12 @@ using UnityEngine.Assertions;
 public class Machine : MonoBehaviour
 {
     //fields////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    [SerializeField] private int workPeriodInBeats;
     [SerializeField] private Recipe[] recipes;
     [SerializeField] private Slot[] slots;
     [SerializeField] private Transform dropPoint;
     [SerializeField] private GameObject itemPrefab;
+    [SerializeField] private ItemData wasteItemData;
     
     [Header("Animation")] 
     [SerializeField] private Sprite[] sprites;
@@ -19,6 +21,9 @@ public class Machine : MonoBehaviour
     private float _oneFrameTime;
     private float _frameTimer = 0f;
     private int _currentFrame = 0;
+    private int _lastDropBeat = int.MinValue;
+    
+    private IReadOnlyCollection<ItemData> _productsToDrop = null;
     
     
     //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,6 +36,10 @@ public class Machine : MonoBehaviour
         
         _oneFrameTime = 1f / fps;
     }
+
+    private void Start() => Beat.Global.BeatEvent += HandleBeat;
+    private void OnDestroy() => Beat.Global.BeatEvent -= HandleBeat;
+
     
     //game events///////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Update()
@@ -41,47 +50,57 @@ public class Machine : MonoBehaviour
             return;
         
         _frameTimer = 0f;
-        _currentFrame = (_currentFrame + 1) % sprites.Length; // Loop back to 0 when the end of the array is reached
-        spriteRenderer.sprite = sprites[_currentFrame]; // Set the current sprite
+        _currentFrame = (_currentFrame + 1) % sprites.Length;
+        spriteRenderer.sprite = sprites[_currentFrame];
     }
-    
-    //private logic/////////////////////////////////////////////////////////////////////////////////////////////////////
-    private void HandleSlotChange(Item previous, Item next)
+
+    private void HandleBeat(int beat)
     {
+        if (beat < _lastDropBeat + workPeriodInBeats)
+            return;
+        
         Recipe foundRecipe = null;
+        _productsToDrop = null;
+        var emptySlots = 0;
+        
+        foreach (var slot in slots)
+        {
+            var item = slot.Get();
+            if (!item)
+                emptySlots++;
+        }
         
         foreach (var recipe in recipes)
         {
-            var ingredients = new Dictionary<ItemData, int>( recipe.Ingredients);
-            var emptySlots = 0;
+            if (emptySlots != recipe.EmptySlots)
+                continue;
+            
+            var unusedIngredients = new Dictionary<ItemData, int>( recipe.Ingredients);
             foreach (var slot in slots)
             {
                 var item = slot.Get();
-                if (!item)
-                {
-                    emptySlots++;
-                    continue;
-                }
+                if (!item) continue;
                 
                 Assert.IsNotNull(item.ItemData);
 
-                if (!ingredients.ContainsKey(item.ItemData)) 
+                if (!unusedIngredients.ContainsKey(item.ItemData)) 
                     break;
                 
-                ingredients[item.ItemData]--;
+                unusedIngredients[item.ItemData]--;
                 
-                if (ingredients[item.ItemData] <= 0)
-                    ingredients.Remove(item.ItemData);
+                if (unusedIngredients[item.ItemData] <= 0)
+                    unusedIngredients.Remove(item.ItemData);
             }
-
-            if (emptySlots != recipe.EmptySlots)
+            
+            if (unusedIngredients.Count != 0)
                 continue;
             
             foundRecipe = recipe;
             break;
         }
 
-        if (!foundRecipe)
+        _productsToDrop = foundRecipe?.Products ?? (emptySlots < slots.Length ? new[] { wasteItemData } : null);
+        if (_productsToDrop == null)
             return;
         
         foreach (var slot in slots)
@@ -93,11 +112,21 @@ public class Machine : MonoBehaviour
             item.Delete();
         }
         
-        foreach (var product in foundRecipe.Products)
+        foreach (var product in _productsToDrop)
         {
             var item = Instantiate(itemPrefab, dropPoint.position, Quaternion.identity).GetComponent<Item>();
             item.transform.SetWorldZ(0);
             item.ItemData = product;
         }
+        
+        _productsToDrop = null;
+        _lastDropBeat = beat;
+    }
+    
+    
+    //private logic/////////////////////////////////////////////////////////////////////////////////////////////////////
+    private void HandleSlotChange(Item previous, Item next)
+    {
+        _lastDropBeat = Beat.Global.CurrentBeat;
     }
 }

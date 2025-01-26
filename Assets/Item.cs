@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 
 public class Item : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class Item : MonoBehaviour
     [SerializeField] private float gravityScale = 1f;
     [SerializeField] private float drag = 0.5f;
     [SerializeField] private float smoothTime = 0.1f;
+    [SerializeField] private ItemData itemData;
     [Header("Dependencies")]
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private CircleCollider2D circleCollider;
@@ -21,7 +23,6 @@ public class Item : MonoBehaviour
     
     private Vector2 _smoothingVelocity = Vector2.zero;
     
-    private ItemData _itemData;
     
     //initialisation////////////////////////////////////////////////////////////////////////////////////////////////////
     private void Awake()
@@ -46,13 +47,13 @@ public class Item : MonoBehaviour
     //public interface//////////////////////////////////////////////////////////////////////////////////////////////////
     public ItemData ItemData
     {
-        get => _itemData;
+        get => itemData;
         set
         {
-            _itemData = value;
-            if (_itemData)
+            itemData = value;
+            if (itemData)
             {
-                spriteRenderer.sprite = _itemData.icon;
+                spriteRenderer.sprite = itemData.icon;
                 gameObject.SetActive(true);
             }
             else
