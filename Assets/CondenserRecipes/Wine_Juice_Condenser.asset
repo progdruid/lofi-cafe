@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8ae573aea4d64169b30242f0583ddab3, type: 3}
-  m_Name: Juice_Berries_Boiler
+  m_Name: Wine_Juice_Condenser
   m_EditorClassIdentifier: 
   ingredients:
     serializedItems:
-    - Key: {fileID: 11400000, guid: c2043641741c5a74fa5b4510fc025325, type: 2}
+    - Key: {fileID: 11400000, guid: 32644cbec21750842847cafee1fde972, type: 2}
       Value: 1
   emptySlots: 1
   products:
-  - {fileID: 11400000, guid: 32644cbec21750842847cafee1fde972, type: 2}
+  - {fileID: 11400000, guid: 21472ec06f573ce4ebd22e914a07d2da, type: 2}

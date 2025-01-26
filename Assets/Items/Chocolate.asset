@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4add24fc1daf428997ca2e6f7dfd7d83, type: 3}
-  m_Name: White Beans
+  m_Name: Chocolate
   m_EditorClassIdentifier: 
-  title: White Beans
-  description: A bunch of tiny bean
-  icon: {fileID: -9206357164454346394, guid: 88d19bed1bd07644c9fd46dd0be31224, type: 3}
+  title: Choco
+  description: Y'know
+  icon: {fileID: 3649261422663048042, guid: 88d19bed1bd07644c9fd46dd0be31224, type: 3}

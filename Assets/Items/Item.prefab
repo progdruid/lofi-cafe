@@ -47,9 +47,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac164293c88741a6990b704fda391aa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravityScale: 1
+  gravityScale: 2
   drag: 0.5
   smoothTime: 0.1
+  itemData: {fileID: 0}
   rb: {fileID: 1194239231808838407}
   circleCollider: {fileID: 8280321896434305970}
   spriteRenderer: {fileID: 1849000222228342876}

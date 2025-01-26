@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: Leaf
-  m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  title: Leaf
-  description: It's a leaf, bro...
-  icon: {fileID: 2613575435287781357, guid: 11dc6fede72e78d4f9ca9a44e47628c0, type: 3}
+  m_Script: {fileID: 11500000, guid: 4add24fc1daf428997ca2e6f7dfd7d83, type: 3}
+  m_Name: Frost
+  m_EditorClassIdentifier: 
+  title: Frost
+  description: Chill out, human
+  icon: {fileID: 338782253340932671, guid: 88d19bed1bd07644c9fd46dd0be31224, type: 3}
