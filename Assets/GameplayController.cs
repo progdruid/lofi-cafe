@@ -106,8 +106,7 @@ public class GameplayController : MonoBehaviour
         item.Delete();
         orderDepositSlot.ItemChangeEvent += HandleSlotItemChange;
         
-        orderPanel.Hide();
-        orderPanel.ShowFor(current.ItemData);
+        orderPanel.ChangeTo(current.ItemData);
 
         var newItem = Instantiate(itemPrefab, new Vector3(10, 10, 0), Quaternion.identity).GetComponent<Item>();
         newItem.ItemData = placedItem;

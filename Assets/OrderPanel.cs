@@ -7,7 +7,8 @@ public class OrderPanel : MonoBehaviour
 {
     [SerializeField] private Sprite[] frameSprites;
     [SerializeField] private float frameRate = 6f;
-    [SerializeField] private float maxDescriptionHeight = 200f;
+    [SerializeField] private float animationDuration = 0.3f;
+    [SerializeField] private bool startOffscreen = true;
 
     private VisualElement _popupRoot;
     private VisualElement _popupPanel;
@@ -15,10 +16,12 @@ public class OrderPanel : MonoBehaviour
     private Label _titleLabel;
     private Label _descriptionLabel;
     private Image _orderImage;
+    private bool _shown = false;
 
     private int _currentFrameIndex;
     private float _frameDuration;
     private Coroutine _animationCoroutine;
+    private Coroutine _slideCoroutine;
 
     private void Awake()
     {
@@ -32,24 +35,76 @@ public class OrderPanel : MonoBehaviour
 
         CreatePopupPanel();
 
-        Hide();
+        if (startOffscreen)
+        {
+            _popupPanel.style.top = -_popupPanel.resolvedStyle.height;
+        }
+    
+        _popupPanel.style.display = DisplayStyle.None;
+        StopFrameAnimation();
     }
 
-    public void ShowFor(ItemData itemData)
+    public void ChangeTo(ItemData itemData)
     {
+        if (_slideCoroutine != null) 
+            StopCoroutine(_slideCoroutine);
+
+        StartCoroutine(ChangeToRoutine(itemData));
+    }
+
+    private IEnumerator ChangeToRoutine(ItemData itemData)
+    {
+        if (_shown)
+        {
+            yield return SlideAnimation(false);
+            StopFrameAnimation();
+        }
+        
         _orderImage.sprite = itemData.icon;
         _titleLabel.text = itemData.title;
         _descriptionLabel.text = itemData.description;
-        _popupPanel.style.display = DisplayStyle.Flex;
 
-        StartFrameAnimation();
+        yield return SlideAnimation(true);
+        StopFrameAnimation();
+        _shown = true;
     }
     
     public void Hide()
     {
-        _popupPanel.style.display = DisplayStyle.None;
+        if (_slideCoroutine != null) StopCoroutine(_slideCoroutine);
+
+        _slideCoroutine = StartCoroutine(SlideAnimation(false));
 
         StopFrameAnimation();
+        _shown = false;
+    }
+
+    private IEnumerator SlideAnimation(bool show)
+    {
+        float elapsedTime = 0;
+        //_popupPanel.resolvedStyle.height
+        float startPosition = show ? -400 : 20;
+        float endPosition = show ? 20 : -400;
+
+        _popupPanel.style.display = DisplayStyle.Flex;
+
+        while (elapsedTime < animationDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / animationDuration;
+            
+            t = t * t * (3f - 2f * t);
+            
+            _popupPanel.style.top = Mathf.Lerp(startPosition, endPosition, t);
+            yield return null;
+        }
+
+        _popupPanel.style.top = endPosition;
+
+        if (!show)
+        {
+            _popupPanel.style.display = DisplayStyle.None;
+        }
     }
 
     private void CreatePopupPanel()
